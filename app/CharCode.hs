@@ -11,8 +11,11 @@ newtype CharCode = MkCharCode Word32 deriving (Eq, Ord)
 toCharCode :: String -> CharCode
 toCharCode s = MkCharCode $ runGet getWord32be $ pack $ fmap (fromIntegral . fromEnum) s
 
+fromCharCode :: CharCode -> String
+fromCharCode (MkCharCode x) = fmap (toEnum . fromIntegral) $ unpack $ runPut $ putWord32be x
+
 instance Show CharCode where
-    show (MkCharCode x) = fmap (toEnum . fromIntegral) $ unpack $ runPut $ putWord32be x
+    show cc = "'" <> fromCharCode cc <> "'"
 
 instance Binary CharCode where
     put (MkCharCode x) = putWord32be x
