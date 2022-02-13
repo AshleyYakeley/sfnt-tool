@@ -4,6 +4,7 @@ import Data.Binary
 import Data.Binary.Get
 import Data.Binary.Put
 import Data.ByteString.Lazy as BS hiding (putStrLn)
+import Data.String
 import Prelude
 
 newtype CharCode = MkCharCode Word32 deriving (Eq, Ord)
@@ -22,3 +23,6 @@ instance Binary CharCode where
     get = do
         x <- getWord32be
         return $ MkCharCode x
+
+instance IsString CharCode where
+    fromString = toCharCode

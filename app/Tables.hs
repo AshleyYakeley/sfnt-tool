@@ -1,4 +1,4 @@
-module Tables (Table (..), TableFile (..), readTableFile, writeTableFile) where
+module Tables (Table (..), TableFile (..), readTableFile, writeTableFile, modifyTable) where
 
 import CharCode
 import qualified Control.Monad.Trans.Class as M
@@ -109,7 +109,7 @@ getTable :: TableEntry -> Get (Maybe Word32, Table)
 getTable MkTableEntry{..} = do
     skip $ fromIntegral teOffset
     bs <- getLazyByteString $ fromIntegral teLength
-    if teTag == toCharCode "head"
+    if teTag == "head"
         then do
             (bs1, _) <- runGetM bs $ pluckChecksum 0
             verifyChecksum (show teTag) teChecksum bs1
@@ -123,6 +123,18 @@ data TableFile = MkTableFile
     , tfTables :: [Table]
     }
     deriving (Eq)
+
+modifyTable :: (MonadFail m, Binary a) => CharCode -> (a -> m a) -> TableFile -> m TableFile
+modifyTable cc f tf = do
+    tables' <- for (tfTables tf) $ \table ->
+        if tTag table == cc
+            then do
+                olda <- runGetM (tData table) get
+                newA <- f olda
+                let newbs = runPut $ put newA
+                return table{tData = newbs}
+            else return table
+    return $ tf{tfTables = tables'}
 
 readTableFile :: MonadFail m => ByteString -> m TableFile
 readTableFile bs = do
@@ -154,7 +166,7 @@ putFirstTableFile MkTableFile{..} = do
                 (offset, csoffsets) <- M.get
                 let entry = tableToEntry offset table
                     csoffsets' =
-                        if teTag entry == toCharCode "head"
+                        if teTag entry == "head"
                             then (offset + 8) : csoffsets
                             else csoffsets
                 M.lift $ put entry
