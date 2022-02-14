@@ -3,7 +3,32 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: Cabal-3.6.2.0@sha256:e2266e14758c1f799220fad7f0d4b0b4ec567d81b7ba3faea17ff76d4c31de95,12437
+    pantry-tree:
+      size: 19757
+      sha256: 6650e54cbbcda6d05c4d8b8094fa61e5ffbda15a798a354d2dad5b35dc3b2859
+  original:
+    hackage: Cabal-3.6.2.0
+- completed:
+    hackage: ghc-lib-parser-9.2.1.20211101@sha256:c7f5649391acb4ceec6770acce3b77dea8aad3fd442b2a32a1d0dbaede080c0b,12705
+    pantry-tree:
+      size: 27578
+      sha256: 445b7dd1908b8187dfdab87673a68f1ca42e2bcfd7dd68f04a3ad91a2215e3e2
+  original:
+    hackage: ghc-lib-parser-9.2.1.20211101
+- completed:
+    name: fourmolu
+    version: 0.5.0.1
+    git: https://github.com/AshleyYakeley/fourmolu.git
+    pantry-tree:
+      size: 128923
+      sha256: 20ce0b8c5a8a591497162afdd85cd88faa87b4c98eb93c91eb0c6f9672c87a42
+    commit: 3b62452795ac8029f7f645f834e74737a355bd14
+  original:
+    git: https://github.com/AshleyYakeley/fourmolu.git
+    commit: 3b62452795ac8029f7f645f834e74737a355bd14
 snapshots:
 - completed:
     size: 587821

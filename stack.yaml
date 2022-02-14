@@ -5,3 +5,9 @@ packages:
 
 ghc-options:
   "$locals": -Werror
+
+extra-deps:
+- Cabal-3.6.2.0
+- ghc-lib-parser-9.2.1.20211101
+- git: https://github.com/AshleyYakeley/fourmolu.git
+  commit: 3b62452795ac8029f7f645f834e74737a355bd14

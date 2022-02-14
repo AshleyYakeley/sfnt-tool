@@ -84,9 +84,9 @@ pad4Length :: Word32 -> Word32
 pad4Length n = ((n + 3) `div` 4) * 4
 
 pad4 :: ByteString -> ByteString
-pad4 bs =
-    let len = length32 bs
-     in bs <> BS.replicate (fromIntegral $ pad4Length len - len) 0
+pad4 bs = let
+    len = length32 bs
+    in bs <> BS.replicate (fromIntegral $ pad4Length len - len) 0
 
 pluckChecksum :: Word32 -> Get (ByteString, Word32)
 pluckChecksum offset = do
@@ -96,11 +96,11 @@ pluckChecksum offset = do
     return (bs1 <> BS.replicate 4 0 <> bs2, checksum)
 
 calcChecksum :: ByteString -> Word32
-calcChecksum bs =
-    let bsp = pad4 bs
-        nLongs = length32 bsp `div` 4
-        longs = runGet (for [1 .. nLongs] $ \_ -> getWord32be) bsp
-     in sum longs
+calcChecksum bs = let
+    bsp = pad4 bs
+    nLongs = length32 bsp `div` 4
+    longs = runGet (for [1 .. nLongs] $ \_ -> getWord32be) bsp
+    in sum longs
 
 verifyChecksum :: MonadFail m => String -> Word32 -> ByteString -> m ()
 verifyChecksum name expected bs = verify (name <> " checksum") expected $ calcChecksum bs
@@ -150,7 +150,8 @@ readTableFile bs = do
 
 putFirstTableFile :: TableFile -> PutM Word32
 putFirstTableFile MkTableFile{..} = do
-    let numTables = fromIntegral $ Prelude.length tfTables
+    let
+        numTables = fromIntegral $ Prelude.length tfTables
         b = logBase2 numTables
         searchRange = bit b * 16
         entrySelector = fromIntegral b
@@ -164,7 +165,8 @@ putFirstTableFile MkTableFile{..} = do
         M.execStateT
             ( for_ tfTables $ \table -> do
                 (offset, csoffsets) <- M.get
-                let entry = tableToEntry offset table
+                let
+                    entry = tableToEntry offset table
                     csoffsets' =
                         if teTag entry == "head"
                             then (offset + 8) : csoffsets
@@ -180,12 +182,12 @@ putFirstTableFile MkTableFile{..} = do
     return csoffset
 
 writeTableFile :: TableFile -> ByteString
-writeTableFile tf =
-    let (csoffset, bs) = runPutM $ putFirstTableFile tf
-        fchecksum = 0xB1B0AFBA - calcChecksum bs
-        (bs0, bs1) = BS.splitAt (fromIntegral csoffset) bs
-        bs2 = BS.drop 4 bs1
-     in runPut $ do
-            putLazyByteString bs0
-            putWord32be fchecksum
-            putLazyByteString bs2
+writeTableFile tf = let
+    (csoffset, bs) = runPutM $ putFirstTableFile tf
+    fchecksum = 0xB1B0AFBA - calcChecksum bs
+    (bs0, bs1) = BS.splitAt (fromIntegral csoffset) bs
+    bs2 = BS.drop 4 bs1
+    in runPut $ do
+        putLazyByteString bs0
+        putWord32be fchecksum
+        putLazyByteString bs2
